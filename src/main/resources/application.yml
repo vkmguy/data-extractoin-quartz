@@ -1,0 +1,33 @@
+server:
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+  port: 8090
+historicalDataApi: http://dataextractionservice:5000/fetchHistoricalData/AAPL
+spring:
+  flyway:
+    enabled: true
+    schemas: public
+    baselineOnMigrate: true
+  datasource:
+    url: jdbc:postgresql://quartz_db:5432/data_extraction_quartz
+    username: postgres
+    password: postgres
+
+  jpa:
+    properties:
+      hibernate:
+        default_schema: public
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: update
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false

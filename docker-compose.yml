@@ -1,0 +1,43 @@
+version: '3.6'
+services:
+  quartz_db:
+    image: postgres:11-alpine
+    hostname: quartz_db
+    container_name: quartz_db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: data_extraction_quartz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./src/main/resources/db/migration/V1_0_0__init.sql:/docker-entrypoint-initdb.d/V1_0_0__init.sql\
+    networks:
+      - quartz_net
+  quartz_app:
+    image: vkmguy/data-extraction-quartz-app
+    hostname: quartzApp
+    container_name: quartzApp
+    depends_on:
+      - quartz_db
+    links:
+      - quartz_db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      - JAVA_OPTS=-Xmx256m
+    networks:
+      - docker-configurations_pg_net
+      - docker-configurations_kafka_net
+      - quartz_net
+
+networks:
+  docker-configurations_kafka_net:
+    external: true
+  docker-configurations_pg_net:
+    external: true
+  quartz_net:
+    driver: bridge
